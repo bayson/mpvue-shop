@@ -1,126 +1,86 @@
 <template>
-  <div @click="clickHandle">
-
-    <div class="userinfo" @click="bindViewTap">
-      <img class="userinfo-avatar" v-if="userInfo.avatarUrl" :src="userInfo.avatarUrl" background-size="cover" />
-      <img class="userinfo-avatar" src="/static/images/user.png" background-size="cover" />
-
-      <div class="userinfo-nickname">
-        <card :text="userInfo.nickName"></card>
-      </div>
+  <div id="app">
+   <v-header :seller="seller"></v-header>
+    <div class="tab">
+          <div class="tab-item" :class="{active:changeNav == index}" v-for="(item,index) in navList" :key="index" :data-current="index" @click="swichNav">
+           {{item.name}}
+          </div>
     </div>
-
-    <div class="usermotto">
-      <div class="user-motto">
-        <card :text="motto"></card>
-      </div>
-    </div>
-
-    <form class="form-container">
-      <input type="text" class="form-control" :value="motto" placeholder="v-model" />
-      <input type="text" class="form-control" v-model="motto" placeholder="v-model" />
-      <input type="text" class="form-control" v-model.lazy="motto" placeholder="v-model.lazy" />
-    </form>
-
-    <a href="/pages/counter/main" class="counter">去往Vuex示例页面</a>
-
-    <div class="all">
-        <div class="left">
-        </div>
-        <div class="right">
-        </div>
-    </div>
+    <goods v-if="changeNav==0" ></goods>
+    <ratings v-if="current==1" :seller="seller"></ratings>
+    <seller v-if="current==2" :seller="seller"></seller>
   </div>
+
 </template>
-
 <script>
-import card from '@/components/card'
-
+  import header from "@/components/header/header";
+  import goods from "@/components/goods/goods";
+  import ratings from "@/components/ratings/ratings";
+  import seller from "@/components/seller/seller";
+  import fly from '@/utils/fly'
+  
 export default {
-  data () {
+  data() {
     return {
-      motto: 'Hello miniprograme',
-      userInfo: {
-        nickName: 'mpvue',
-        avatarUrl: 'http://mpvue.com/assets/logo.png'
-      }
+      goods:{},
+      seller: {},
+      navList: [{name:'菜单'},{name:'评价'},{name:'商家'}],
+      changeNav:0,
+      current: null
     }
   },
-
-  components: {
-    card
-  },
-
   methods: {
-    bindViewTap () {
-      const url = '../logs/main'
-      if (mpvuePlatform === 'wx') {
-        mpvue.switchTab({ url })
-      } else {
-        mpvue.navigateTo({ url })
-      }
-    },
-    clickHandle (ev) {
-      console.log('clickHandle:', ev)
-      // throw {message: 'custom test'}
-    }
+     swichNav(e) {
+       const current = e.currentTarget.dataset.current
+        this.changeNav = current
+        this.current = current
+      //  console.log(current)
+     },
+    
   },
-
-  created () {
-    // let app = getApp()
+  created() {
+     fly.get('sell#!method=get').then((res)=>{
+              this.goods = res.data.data.goods
+              this.seller = res.data.data.seller
+            }).catch((e)=>{
+            console.log(e)
+            })
+    },
+  components: {
+    "v-header":header,
+    goods:goods,
+    ratings: ratings,
+    seller: seller,
   }
 }
 </script>
-
-<style scoped>
-.userinfo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.userinfo-avatar {
-  width: 128rpx;
-  height: 128rpx;
-  margin: 20rpx;
-  border-radius: 50%;
-}
-
-.userinfo-nickname {
-  color: #aaa;
-}
-
-.usermotto {
-  margin-top: 150px;
-}
-
-.form-control {
-  display: block;
-  padding: 0 12px;
-  margin-bottom: 5px;
-  border: 1px solid #ccc;
-}
-.all{
-  width:7.5rem;
-  height:1rem;
-  background-color:blue;
-}
-.all:after{
-  display:block;
-  content:'';
-  clear:both;
-}
-.left{
-  float:left;
-  width:3rem;
-  height:1rem;
-  background-color:red;
-}
-
-.right{
-  float:left;
-  width:4.5rem;
-  height:1rem;
-  background-color:green;
-}
+<style lang="stylus" scoped>
+#app
+  height 100vh
+  width 100%
+  overflow hidden
+  .tab
+    display flex
+    justify-content space-around
+    align-items center
+    width 100%
+    height 80rpx
+    text-align center
+    position relative
+    &:after 
+      display block
+      position absolute
+      left 0
+      bottom 0
+      width 100%
+      border-top 1px solid rgba(7, 17, 27, 0.1)
+      content ''
+    .tab-item
+      font-size 28rpx
+      color rgb(77,85,93)
+      line-height 28rpx
+    .active  
+      color rgb(240, 20, 20)
+      font-weight 500
+    
 </style>
