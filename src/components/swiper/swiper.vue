@@ -70,8 +70,8 @@ export default {
    methods: {
         choose() {
          wx.showToast({
-            title: '代完善',
-            icon: 'success',
+            title: "代完善",
+            icon: "success",
             duration: 2000
             })
         }

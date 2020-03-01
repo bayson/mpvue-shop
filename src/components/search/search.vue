@@ -34,6 +34,7 @@ export default {
                 },
             success:  (res) => {
                 this.location = res.result.formatted_addresses.recommend
+                this.GLOBAL.location = this.location
             },
 
         });
